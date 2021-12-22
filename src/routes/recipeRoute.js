@@ -47,6 +47,11 @@ router.get('/recipes/:id', validateAuth, async (req, res) => {
 			},
 			include: {
 				ingredients: true,
+				_count: {
+					select: {
+						likedBy: true,
+					},
+				},
 			},
 		});
 		if (!recipe) {

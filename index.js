@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const authRoute = require('./src/routes/authRoute');
 const recipeRoute = require('./src/routes/recipeRoute');
+const likeRecipe = require('./src/routes/likeRecipe');
 const cors = require('cors');
 const app = express();
 const validateAuth = require('./src/middlewares/validateAuth');
@@ -17,6 +18,7 @@ app.use('/check', async (req, res) => {
 
 app.use('/api/auth', authRoute);
 app.use('/api/v1/', validateAuth, recipeRoute);
+app.use('/api/v1/', validateAuth, likeRecipe);
 
 app.listen(port, () => {
 	console.log(`Server is running on ${process.env.PORT}`);

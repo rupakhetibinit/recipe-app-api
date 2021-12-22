@@ -48,6 +48,7 @@ router.post('/register', validation(userSchema), async (req, res) => {
 		);
 		return res.status(201).json({
 			success: true,
+			userId: savedUser.id,
 			name: savedUser.name,
 			email: savedUser.email,
 			isAdmin: savedUser.isAdmin,
@@ -96,6 +97,7 @@ router.post('/login', validation(loginSchema), async (req, res) => {
 		);
 
 		return res.json({
+			userId: user.id,
 			success: true,
 			email: user.email,
 			accessToken: accessToken,
