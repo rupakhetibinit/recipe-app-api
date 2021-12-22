@@ -49,9 +49,29 @@ router.get('/recipes/:id', validateAuth, async (req, res) => {
 				ingredients: true,
 			},
 		});
+		if (!recipe) {
+			res.json({ message: 'Recipe not found' });
+		}
 		res.json({ message: 'Recipe fetched', recipe: recipe });
 	} catch (err) {
-		console.log(err);
+		res.json({ error: 'Something went wrong' });
+	}
+});
+
+// Delete recipe by id
+router.delete('/recipes/:id', validateAuth, async (req, res) => {
+	try {
+		const recipe = await prisma.recipe.delete({
+			where: {
+				id: req.params.id,
+			},
+		});
+		if (!recipe) {
+			res.json({ message: 'Recipe not found' });
+		}
+		res.json({ message: 'Recipe deleted', recipe: recipe });
+	} catch (err) {
+		res.json({ error: 'Something went wrong' });
 	}
 });
 
