@@ -46,7 +46,6 @@ router.get('/orders', validateAuth, async (req, res) => {
 			},
 			include: {
 				recipe: true,
-				user: true,
 				ingredients: true,
 			},
 		});
