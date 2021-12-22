@@ -94,29 +94,11 @@ router.post('/login', validation(loginSchema), async (req, res) => {
 				expiresIn: process.env.JWT_REFRESH_TIME || '30d',
 			}
 		);
-		const userRefreshToken = await prisma.user.update({
-			where: {
-				id: user.id,
-			},
-			data: {
-				RefreshToken: {
-					upsert: {
-						create: {
-							token: refreshToken,
-						},
-						update: {
-							token: refreshToken,
-						},
-					},
-				},
-			},
-		});
 
 		return res.json({
 			success: true,
 			email: email,
 			accessToken: accessToken,
-			refreshToken: userRefreshToken,
 		});
 	} else {
 		return res.json({
