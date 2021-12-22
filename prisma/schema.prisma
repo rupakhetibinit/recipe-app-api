@@ -57,6 +57,7 @@ model Orders {
   recipe Recipe @relation(fields: [recipeId], references: [id])
   ingredients Ingredient[]
   total Int
+  delivered Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 }

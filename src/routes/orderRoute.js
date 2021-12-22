@@ -31,7 +31,7 @@ router.post('/order', validateAuth, async (req, res) => {
 		});
 		res.json({ message: 'Order created', order: order });
 	} catch (err) {
-		console.log(err);
+		res.json({ message: 'Something went wrong', error: err });
 	}
 });
 
@@ -54,7 +54,7 @@ router.get('/orders', validateAuth, async (req, res) => {
 		}
 		res.json({ message: 'Orders fetched', orders: orders });
 	} catch (err) {
-		console.log(err);
+		res.json({ message: 'Something went wrong', error: err });
 	}
 });
 
@@ -77,7 +77,54 @@ router.delete('/order/:id', validateAuth, async (req, res) => {
 
 		res.json({ message: 'Order deleted', order: order });
 	} catch (err) {
-		console.log(err);
+		res.json({ message: 'Something went wrong', error: err });
+	}
+});
+
+// Deliver an order
+router.patch('/order/:id', validateAuth, async (req, res) => {
+	try {
+		const deliveredOrder = await prisma.orders.update({
+			where: {
+				id: parseInt(req.params.id),
+			},
+			data: {
+				delivered: true,
+			},
+		});
+		if (deliveredOrder === null) {
+			res.json({ message: 'Order not found' });
+		}
+		res.json({ message: 'Order delivered', order: deliveredOrder });
+	} catch (err) {
+		res.json({ message: 'Something went wrong', error: err });
+	}
+});
+
+// get all delivered orders
+router.get('/orders/delivered', validateAuth, async (req, res) => {
+	try {
+		const getDeliveredOrders = await prisma.orders.findMany({
+			where: {
+				user: {
+					id: parseInt(req.body.userId),
+				},
+				delivered: true,
+			},
+			include: {
+				recipe: true,
+				ingredients: true,
+			},
+		});
+		if (getDeliveredOrders === null) {
+			res.json({ message: 'No delivered orders found' });
+		}
+		res.json({
+			message: 'Delivered orders fetched',
+			orders: getDeliveredOrders,
+		});
+	} catch (err) {
+		res.json({ message: 'Something went wrong', error: err });
 	}
 });
 
