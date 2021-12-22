@@ -97,8 +97,10 @@ router.post('/login', validation(loginSchema), async (req, res) => {
 
 		return res.json({
 			success: true,
-			email: email,
+			email: user.email,
 			accessToken: accessToken,
+			name: user.name,
+			isAdmin: user.isAdmin,
 		});
 	} else {
 		return res.json({
