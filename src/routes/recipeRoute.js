@@ -41,9 +41,9 @@ router.get('/recipes', async (req, res) => {
 // Get recipe by id
 router.get('/recipes/:id', validateAuth, async (req, res) => {
 	try {
-		const recipe = await prisma.recipe.findOne({
+		const recipe = await prisma.recipe.findUnique({
 			where: {
-				id: req.params.id,
+				id: parseInt(req.params.id),
 			},
 			include: {
 				ingredients: true,
@@ -54,7 +54,8 @@ router.get('/recipes/:id', validateAuth, async (req, res) => {
 		}
 		res.json({ message: 'Recipe fetched', recipe: recipe });
 	} catch (err) {
-		res.json({ error: 'Something went wrong' });
+		console.log(err);
+		res.json({ error: 'Something went wrong', err: err });
 	}
 });
 
