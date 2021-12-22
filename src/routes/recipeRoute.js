@@ -2,25 +2,22 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const express = require('express');
 const router = express.Router();
+const validateAuth = require('../middlewares/validateAuth');
 
-router.post('/recipes', async (req, res) => {
+router.post('/recipes', validateAuth, async (req, res) => {
 	try {
 		const recipe = await prisma.recipe.create({
 			data: {
-				name: 'Test',
-				description: 'Test',
-				imageUrl: 'Test',
-				steps: ['Test'],
+				name: req.body.name,
+				description: req.body.description,
+				imageUrl: req.body.imageUrl,
+				servings: req.body.servings,
+				steps: req.body.steps,
 				ingredients: {
 					createMany: {
-						data: [
-							{ name: 'Test', measurement: 'Test', amount: 1, price: 20 },
-							{ name: 'Test', measurement: 'Test', amount: 1, price: 20 },
-							{ name: 'Test', measurement: 'Test', amount: 1, price: 20 },
-						],
+						data: req.body.ingredients,
 					},
 				},
-				servings: 4,
 			},
 			include: {
 				ingredients: true,
@@ -34,12 +31,25 @@ router.post('/recipes', async (req, res) => {
 
 router.get('/recipes', async (req, res) => {
 	try {
-		const recipes = await prisma.recipe.findMany({
+		const recipes = await prisma.recipe.findMany({});
+		res.json({ message: 'Recipes fetched', recipes: recipes });
+	} catch (err) {
+		console.log(err);
+	}
+});
+
+// Get recipe by id
+router.get('/recipes/:id', validateAuth, async (req, res) => {
+	try {
+		const recipe = await prisma.recipe.findOne({
+			where: {
+				id: req.params.id,
+			},
 			include: {
 				ingredients: true,
 			},
 		});
-		res.json({ message: 'Recipes fetched', recipes: recipes });
+		res.json({ message: 'Recipe fetched', recipe: recipe });
 	} catch (err) {
 		console.log(err);
 	}

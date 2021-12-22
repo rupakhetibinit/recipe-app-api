@@ -47,7 +47,7 @@ model Ingredient {
   orders Orders[] 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
-  }
+}
 
 model Orders {
   id Int @id @default(autoincrement())
