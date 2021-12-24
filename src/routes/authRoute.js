@@ -70,14 +70,6 @@ router.post('/login', validation(loginSchema), async (req, res) => {
 		},
 	});
 
-	if (user == null) {
-		return res
-			.json({
-				success: false,
-				error: `Error! User not found`,
-			})
-			.status(404);
-	}
 	const { isAdmin } = user;
 	const success = await bcrypt.compare(password, user.password);
 	if (success) {
