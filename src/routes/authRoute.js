@@ -70,7 +70,6 @@ router.post('/login', validation(loginSchema), async (req, res) => {
 				email: email,
 			},
 		});
-
 		if (!user) {
 			console.log('User not found');
 			return res.status(404).json({
@@ -78,7 +77,7 @@ router.post('/login', validation(loginSchema), async (req, res) => {
 				error: 'User not found',
 			});
 		}
-
+		const isAdmin = user.isAdmin;
 		const success = await bcrypt.compare(password, user.password);
 		if (success) {
 			const accessToken = jwt.sign(
