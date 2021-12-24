@@ -18,9 +18,9 @@ app.use('/check', async (req, res) => {
 });
 
 app.use('/api/auth', authRoute);
-app.use('/api/v1/', validateAuth, recipeRoute);
-app.use('/api/v1/', validateAuth, likeRecipe);
-app.use('/api/v1/', validateAuth, orderRoute);
+app.use('/api/v1', validateAuth, recipeRoute);
+app.use('/api/v1', validateAuth, likeRecipe);
+app.use('/api/v1', validateAuth, orderRoute);
 
 app.listen(port, () => {
 	console.log(`Server is running on ${process.env.PORT}`);
