@@ -50,7 +50,7 @@ router.delete('/recipes/:id/like', async (req, res) => {
 	try {
 		const recipe = await prisma.recipe.findUnique({
 			where: {
-				id: parseInt(req.params.id),
+				id: req.params.id,
 			},
 		});
 		if (!recipe) {
