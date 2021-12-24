@@ -41,7 +41,7 @@ router.post('/recipes/:id/like', async (req, res) => {
 		res.json({ message: 'Recipe liked', like: like });
 	} catch (err) {
 		console.log(err);
-		res.json({ error: 'Something went wrong', err: err });
+		res.json({ error: 'Something went wrong', err: err, message: err.message });
 	}
 });
 
@@ -58,7 +58,7 @@ router.delete('/recipes/:id/like', async (req, res) => {
 		}
 		const user = await prisma.user.findUnique({
 			where: {
-				id: req.body.userId,
+				id: parseInt(req.body.userId),
 			},
 		});
 		if (!user) {
