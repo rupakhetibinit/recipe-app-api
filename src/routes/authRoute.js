@@ -63,44 +63,54 @@ router.post('/register', validation(userSchema), async (req, res) => {
 });
 
 router.post('/login', validation(loginSchema), async (req, res) => {
-	const { email, password } = req.body;
-	const user = await prisma.user.findUnique({
-		where: {
-			email: email,
-		},
-	});
+	try {
+		const { email, password } = req.body;
 
-	const { isAdmin } = user;
-	const success = await bcrypt.compare(password, user.password);
-	if (success) {
-		const accessToken = jwt.sign(
-			{ email, isAdmin },
-			process.env.JWT_ACCESS_SECRET || 'secretaccess',
-			{
-				expiresIn: process.env.JWT_ACCESS_TIME || '30d',
-			}
-		);
-		const refreshToken = jwt.sign(
-			{ email, isAdmin },
-			process.env.JWT_REFRESH_SECRET || 'secretrefresh',
-			{
-				expiresIn: process.env.JWT_REFRESH_TIME || '30d',
-			}
-		);
+		if (!user) {
+			console.log('User not found');
+			return res.status(404).json({
+				success: false,
+				error: 'User not found',
+			});
+		}
 
-		return res.json({
-			userId: user.id,
-			success: true,
-			email: user.email,
-			accessToken: accessToken,
-			name: user.name,
-			isAdmin: user.isAdmin,
-		});
-	} else {
-		return res.json({
-			success: false,
-			error: `Error email or password doesn't match`,
-		});
+		const { isAdmin } = user;
+		const success = await bcrypt.compare(password, user.password);
+		if (success) {
+			const accessToken = jwt.sign(
+				{ email, isAdmin },
+				process.env.JWT_ACCESS_SECRET || 'secretaccess',
+				{
+					expiresIn: process.env.JWT_ACCESS_TIME || '30d',
+				}
+			);
+			const refreshToken = jwt.sign(
+				{ email, isAdmin },
+				process.env.JWT_REFRESH_SECRET || 'secretrefresh',
+				{
+					expiresIn: process.env.JWT_REFRESH_TIME || '30d',
+				}
+			);
+
+			return res.json({
+				userId: user.id,
+				success: true,
+				email: user.email,
+				accessToken: accessToken,
+				name: user.name,
+				isAdmin: user.isAdmin,
+			});
+		} else {
+			return res.json({
+				success: false,
+				error: `Error email or password doesn't match`,
+			});
+		}
+	} catch (error) {
+		console.log(error);
+		return res
+			.status(500)
+			.json({ success: false, error: 'Internal Sever Error' });
 	}
 });
 
