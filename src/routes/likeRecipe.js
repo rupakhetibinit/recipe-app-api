@@ -86,7 +86,7 @@ router.patch('/recipes/:id/like', async (req, res) => {
 });
 
 // Get liked recipe of user
-router.get('/recipes/liked/:id', async (req, res) => {
+router.get('/user/liked/:id', async (req, res) => {
 	try {
 		const recipe = await prisma.recipe.findMany({
 			where: {
