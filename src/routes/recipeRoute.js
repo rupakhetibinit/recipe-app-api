@@ -75,6 +75,9 @@ router.delete('/recipes/:id', validateAuth, async (req, res) => {
 			where: {
 				id: req.params.id,
 			},
+			include: {
+				likedBy: true,
+			},
 		});
 		if (!recipe) {
 			res.json({ message: 'Recipe not found' });
