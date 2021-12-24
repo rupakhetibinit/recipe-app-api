@@ -16,7 +16,7 @@ router.post('/recipes/:id/like', async (req, res) => {
 		}
 		const user = await prisma.user.findUnique({
 			where: {
-				id: req.body.userId,
+				id: parseInt(req.body.userId),
 			},
 		});
 		if (!user) {
@@ -46,11 +46,11 @@ router.post('/recipes/:id/like', async (req, res) => {
 });
 
 // Dislike a recipe
-router.delete('/recipes/:id/like', async (req, res) => {
+router.patch('/recipes/:id/like', async (req, res) => {
 	try {
 		const recipe = await prisma.recipe.findUnique({
 			where: {
-				id: req.params.id,
+				id: parseInt(req.params.id),
 			},
 		});
 		if (!recipe) {
