@@ -70,7 +70,7 @@ router.post('/login', validation(loginSchema), async (req, res) => {
 		},
 	});
 
-	if (!user) {
+	if (user == null) {
 		return res
 			.json({
 				success: false,
