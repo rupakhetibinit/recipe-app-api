@@ -65,6 +65,11 @@ router.post('/register', validation(userSchema), async (req, res) => {
 router.post('/login', validation(loginSchema), async (req, res) => {
 	try {
 		const { email, password } = req.body;
+		const user = await prisma.user.findUnique({
+			where: {
+				email: email,
+			},
+		});
 
 		if (!user) {
 			console.log('User not found');
@@ -74,7 +79,6 @@ router.post('/login', validation(loginSchema), async (req, res) => {
 			});
 		}
 
-		const { isAdmin } = user;
 		const success = await bcrypt.compare(password, user.password);
 		if (success) {
 			const accessToken = jwt.sign(
