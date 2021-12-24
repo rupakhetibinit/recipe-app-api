@@ -31,7 +31,11 @@ router.post('/recipes', validateAuth, async (req, res) => {
 
 router.get('/recipes', async (req, res) => {
 	try {
-		const recipes = await prisma.recipe.findMany({});
+		const recipes = await prisma.recipe.findMany({
+			include: {
+				ingredients: true,
+			},
+		});
 		res.json({ message: 'Recipes fetched', recipes: recipes });
 	} catch (err) {
 		console.log(err);
