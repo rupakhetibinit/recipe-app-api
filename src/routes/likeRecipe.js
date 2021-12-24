@@ -85,4 +85,28 @@ router.delete('/recipes/:id/like', async (req, res) => {
 	}
 });
 
+// Get liked recipe of user
+router.get('/recipes/:id/liked', async (req, res) => {
+	try {
+		const recipe = await prisma.recipe.findMany({
+			where: {
+				likedBy: {
+					some: {
+						id: parseInt(req.params.id),
+					},
+				},
+			},
+			include: {
+				likedBy: true,
+			},
+		});
+		if (!recipe) {
+			res.json({ message: 'Recipe not found' });
+		}
+		res.json({ message: 'Liked Recipes', recipe: recipe });
+	} catch (err) {
+		console.log(err);
+	}
+});
+
 module.exports = router;
