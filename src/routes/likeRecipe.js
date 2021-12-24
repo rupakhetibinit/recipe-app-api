@@ -88,22 +88,18 @@ router.patch('/recipes/:id/like', async (req, res) => {
 // Get liked recipe of user
 router.get('/user/liked/:id', async (req, res) => {
 	try {
-		const recipe = await prisma.recipe.findMany({
+		const recipes = await prisma.user.findUnique({
 			where: {
-				likedBy: {
-					some: {
-						id: parseInt(req.params.id),
-					},
-				},
+				id: parseInt(req.params.id),
 			},
-			include: {
-				likedBy: true,
+			select: {
+				likedRecipes: true,
 			},
 		});
 		if (!recipe) {
 			res.json({ message: 'Recipe not found' });
 		}
-		res.json({ message: 'Liked Recipes', recipe: recipe });
+		res.json({ message: 'Liked Recipes', recipes: recipes });
 	} catch (err) {
 		console.log(err);
 	}
