@@ -51,6 +51,7 @@ router.get('/recipes/:id', validateAuth, async (req, res) => {
 			},
 			include: {
 				ingredients: true,
+				likedBy: true,
 				_count: {
 					select: {
 						likedBy: true,
@@ -74,9 +75,6 @@ router.delete('/recipes/:id', validateAuth, async (req, res) => {
 		const recipe = await prisma.recipe.delete({
 			where: {
 				id: req.params.id,
-			},
-			include: {
-				likedBy: true,
 			},
 		});
 		if (!recipe) {
