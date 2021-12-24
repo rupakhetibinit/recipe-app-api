@@ -34,6 +34,11 @@ router.get('/recipes', async (req, res) => {
 		const recipes = await prisma.recipe.findMany({
 			include: {
 				ingredients: true,
+				_count: {
+					select: {
+						likedBy: true,
+					},
+				},
 			},
 		});
 		res.json({ message: 'Recipes fetched', recipes: recipes });
