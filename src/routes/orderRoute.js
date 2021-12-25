@@ -132,4 +132,27 @@ router.get('/orders/delivered', validateAuth, async (req, res) => {
 	}
 });
 
+// Get all orders
+
+router.get('/orders', validateAuth, async (req, res, next) => {
+	try {
+		const getAllOrders = await prisma.orders.findMany({
+			include: {
+				user: true,
+				ingredients: true,
+				recipe: true,
+			},
+		});
+		if (getAllOrders === null) {
+			res.json({ message: 'No orders found' });
+		}
+		res.json({
+			message: 'Orders fetched',
+			orders: getAllOrders,
+		});
+	} catch (err) {
+		res.json({ message: 'Something went wrong', error: err });
+	}
+});
+
 module.exports = router;
