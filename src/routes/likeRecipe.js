@@ -93,13 +93,21 @@ router.get('/user/liked/:id', async (req, res) => {
 				id: parseInt(req.params.id),
 			},
 			select: {
-				likedRecipes: true,
+				likedRecipes: {
+					include: {
+						_count: {
+							select: {
+								likedBy: true,
+							},
+						},
+					},
+				},
 			},
 		});
 		if (!recipes) {
 			res.json({ message: 'Recipe not found' });
 		}
-		res.json({ message: 'Liked Recipes', recipes: recipes });
+		res.status(200).json({ message: 'Liked Recipes', recipes: recipes });
 	} catch (err) {
 		console.log(err);
 	}

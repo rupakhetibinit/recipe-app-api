@@ -22,6 +22,7 @@ router.post('/order', validateAuth, async (req, res) => {
 					connect: req.body.ingredients,
 				},
 				total: req.body.total,
+				id: req.body.id,
 			},
 			include: {
 				recipe: true,

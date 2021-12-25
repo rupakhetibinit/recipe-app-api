@@ -50,7 +50,7 @@ model Ingredient {
 }
 
 model Orders {
-  id Int @id @default(autoincrement())
+  id String @id @unique
   userId Int
   recipeId Int
   user User @relation(fields: [userId], references: [id])
