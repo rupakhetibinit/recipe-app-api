@@ -8,9 +8,13 @@ const cors = require('cors');
 const app = express();
 const validateAuth = require('./src/middlewares/validateAuth');
 
+corsOptions = {
+	origin: 'https://svelte-recipe-admin.vercel.app/',
+};
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
+
 app.use(function (req, res, next) {
 	res.header('Access-Control-Allow-Origin', '*');
 	res.header(
