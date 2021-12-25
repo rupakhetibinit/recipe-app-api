@@ -11,6 +11,7 @@ const validateAuth = require('./src/middlewares/validateAuth');
 corsOptions = {
 	origin: 'https://svelte-recipe-admin.vercel.app/',
 	methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+	successStatus: 200,
 };
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
