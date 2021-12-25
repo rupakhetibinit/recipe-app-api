@@ -96,7 +96,7 @@ router.get('/user/liked/:id', async (req, res) => {
 				likedRecipes: true,
 			},
 		});
-		if (!recipe) {
+		if (!recipes) {
 			res.json({ message: 'Recipe not found' });
 		}
 		res.json({ message: 'Liked Recipes', recipes: recipes });
