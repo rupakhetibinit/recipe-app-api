@@ -67,7 +67,7 @@ router.delete('/order/:id', validateAuth, async (req, res) => {
 	try {
 		const findOrder = await prisma.orders.findUnique({
 			where: {
-				id: parseInt(req.params.id),
+				id: req.params.id,
 			},
 		});
 		if (findOrder === null) {
@@ -75,7 +75,7 @@ router.delete('/order/:id', validateAuth, async (req, res) => {
 		}
 		const order = await prisma.orders.delete({
 			where: {
-				id: parseInt(req.params.id),
+				id: req.params.id,
 			},
 		});
 
