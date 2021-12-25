@@ -90,7 +90,7 @@ router.patch('/order/:id', validateAuth, async (req, res) => {
 	try {
 		const deliveredOrder = await prisma.orders.update({
 			where: {
-				id: parseInt(req.params.id),
+				id: req.params.id,
 			},
 			data: {
 				delivered: true,
