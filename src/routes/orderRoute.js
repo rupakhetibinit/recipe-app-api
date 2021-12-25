@@ -55,7 +55,13 @@ router.get('/orders', validateAuth, async (req, res) => {
 		}
 		res.json({ message: 'Orders fetched', orders: orders });
 	} catch (err) {
-		res.json({ message: 'Something went wrong', error: err });
+		res.json({
+			message: 'Something went wrong',
+			error: {
+				err,
+				message: err.message,
+			},
+		});
 	}
 });
 
