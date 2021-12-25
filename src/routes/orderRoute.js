@@ -37,13 +37,13 @@ router.post('/order', validateAuth, async (req, res) => {
 });
 
 // get all orders for a user
-router.get('/orders', validateAuth, async (req, res) => {
-	console.log(req.body.userId);
+router.get('/orders/:userId', validateAuth, async (req, res) => {
+	console.log(req.params.userId);
 	try {
 		const orders = await prisma.orders.findMany({
 			where: {
 				userId: {
-					equals: parseInt(req.body.userId),
+					equals: parseInt(req.params.userId),
 				},
 			},
 		});
