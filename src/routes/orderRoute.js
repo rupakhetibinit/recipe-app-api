@@ -41,16 +41,10 @@ router.get('/orders', validateAuth, async (req, res) => {
 	try {
 		const orders = await prisma.orders.findMany({
 			where: {
-				user: {
-					id: parseInt(req.body.userId),
-				},
-			},
-			include: {
-				recipe: true,
-				ingredients: true,
+				userId: parseInt(req.body.userId),
 			},
 		});
-		if (orders === null) {
+		if (!orders) {
 			res.json({ message: 'No orders found' });
 		}
 		res.json({ message: 'Orders fetched', orders: orders });
