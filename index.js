@@ -8,6 +8,7 @@ const cors = require('cors');
 const app = express();
 const validateAuth = require('./src/middlewares/validateAuth');
 
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 dotenv.config();
