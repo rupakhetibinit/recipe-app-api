@@ -12,14 +12,19 @@ const validateAuth = require('./src/middlewares/validateAuth');
 // Image upload code
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
-
+const crypto = require('crypto');
 const storage = multer.diskStorage({
 	destination: function (req, file, cb) {
 		cb(null, path.join(__dirname, '/uploads'));
 	},
 	filename: function (req, file, cb) {
-		cb(null, file.originalname);
+		// create hash for the file name and save to file
+		crypto.randomBytes(16, (err, hash) => {
+			if (err) {
+				return cb(err);
+			}
+			cb(null, hash.toString('hex') + path.extname(file.originalname));
+		});
 	},
 });
 
@@ -37,14 +42,22 @@ app.post(
 	'/image-upload-single',
 	upload.single('recipe-file'),
 	function (req, res, next) {
-		console.log(req.file);
-		const response = {
-			success: true,
-			file: req.file,
-			message: 'File uploaded successfully',
-			path: req.file.path,
-		};
-		return res.json(response);
+		try {
+			console.log(req.file);
+			const response = {
+				success: true,
+				file: req.file,
+				message: 'File uploaded successfully',
+				path: req.file.path,
+			};
+			return res.json(response);
+		} catch (err) {
+			console.log(err);
+			return res.json({
+				success: false,
+				message: 'Error uploading file',
+			});
+		}
 	}
 );
 
