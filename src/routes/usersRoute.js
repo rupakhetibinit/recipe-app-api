@@ -6,7 +6,15 @@ const prisma = new PrismaClient();
 
 router.get('/users', validateAuth, async (req, res) => {
 	try {
-		const users = await prisma.user.findMany({});
+		const users = await prisma.user.findMany({
+			include: {
+				_count: {
+					select: {
+						orders: true,
+					},
+				},
+			},
+		});
 		res.json({ success: true, message: 'Users fetched', users: users });
 	} catch (err) {
 		console.log(err);
