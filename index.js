@@ -8,11 +8,45 @@ const usersRoute = require('./src/routes/usersRoute');
 const cors = require('cors');
 const app = express();
 const validateAuth = require('./src/middlewares/validateAuth');
+
+// Image upload code
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+const storage = multer.diskStorage({
+	destination: function (req, file, cb) {
+		cb(null, './uploads/');
+	},
+	filename: function (req, file, cb) {
+		cb(null, file.originalname);
+	},
+});
+
+const upload = multer({ storage: storage });
+dotenv.config();
+const port = process.env.PORT || 4000;
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-dotenv.config();
-const port = process.env.PORT || 4000;
+app.use(express.static(__dirname + '/uploads'));
+app.use('/uploads', express.static('/uploads'));
+
+app.post(
+	'/image-upload-single',
+	upload.single('recipe-file'),
+	function (req, res, next) {
+		console.log(req.file);
+		const response = {
+			success: true,
+			file: req.file,
+			message: 'File uploaded successfully',
+			path: req.file.path,
+		};
+		return res.json(response);
+	}
+);
 
 app.use('/check', async (req, res) => {
 	res.send('Successfully deployed').status(200);
