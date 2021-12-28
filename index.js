@@ -13,9 +13,9 @@ const { CloudinaryStorage } = require('multer-storage-cloudinary');
 dotenv.config();
 
 cloudinary.config({
-	cloud_name: 'de64lzgm6',
-	api_key: '699577725871435',
-	api_secret: '9u67fSOp8ZOgIeSzfdWqzVC_86w',
+	cloud_name: process.env.CLOUD_NAME,
+	api_key: process.env.CLOUD_API_KEY,
+	api_secret: process.env.CLOUD_API_SECRET,
 });
 
 // Image upload code
