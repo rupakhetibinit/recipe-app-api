@@ -8,28 +8,26 @@ const usersRoute = require('./src/routes/usersRoute');
 const cors = require('cors');
 const app = express();
 const validateAuth = require('./src/middlewares/validateAuth');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+dotenv.config();
+
+cloudinary.config({
+	cloud_name: process.env.CLOUD_NAME,
+	api_key: process.env.CLOUD_API_KEY,
+	api_secret: process.env.CLOUD_API_SECRET,
+});
 
 // Image upload code
 const multer = require('multer');
-const path = require('path');
-const crypto = require('crypto');
-const storage = multer.diskStorage({
-	destination: function (req, file, cb) {
-		cb(null, path.join(__dirname, '/uploads'));
-	},
-	filename: function (req, file, cb) {
-		// create hash for the file name and save to file
-		crypto.randomBytes(16, (err, hash) => {
-			if (err) {
-				return cb(err);
-			}
-			cb(null, hash.toString('hex') + path.extname(file.originalname));
-		});
+const storage = new CloudinaryStorage({
+	cloudinary: cloudinary,
+	params: {
+		folder: 'Recipe-App',
 	},
 });
 
 const upload = multer({ storage: storage });
-dotenv.config();
 const port = process.env.PORT || 4000;
 
 app.use(cors());
@@ -46,7 +44,7 @@ app.post(
 			console.log(req.file);
 			const response = {
 				success: true,
-				file: req.file,
+
 				message: 'File uploaded successfully',
 				path: req.file.path,
 			};
