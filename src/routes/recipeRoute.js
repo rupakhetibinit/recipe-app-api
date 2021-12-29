@@ -79,7 +79,7 @@ router.delete('/recipes/:id', validateAuth, async (req, res) => {
 	try {
 		const recipe = await prisma.recipe.delete({
 			where: {
-				id: req.params.id,
+				id: parseInt(req.params.id),
 			},
 		});
 		if (!recipe) {
