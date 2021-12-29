@@ -25,7 +25,7 @@ router.post('/recipes', validateAuth, async (req, res) => {
 		});
 		res.json({ message: 'Recipe created', recipe: recipe });
 	} catch (err) {
-		console.log(error);
+		console.log(err);
 	}
 });
 
