@@ -87,6 +87,7 @@ router.delete('/recipes/:id', validateAuth, async (req, res) => {
 		}
 		res.json({ message: 'Recipe deleted', recipe: recipe });
 	} catch (err) {
+		console.log(err);
 		res.json({ error: 'Something went wrong' });
 	}
 });
