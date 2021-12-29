@@ -77,15 +77,26 @@ router.get('/recipes/:id', validateAuth, async (req, res) => {
 // Delete recipe by id
 router.delete('/recipes/:id', validateAuth, async (req, res) => {
 	try {
-		const recipe = await prisma.recipe.delete({
+		const deleteIngredients = prisma.ingredient.deleteMany({
+			where: {
+				recipeId: parseInt(req.params.id),
+			},
+		});
+		const deleteRecipe = prisma.recipe.delete({
 			where: {
 				id: parseInt(req.params.id),
 			},
 		});
-		if (!recipe) {
+
+		const transaction = await prisma.$transaction([
+			deleteIngredients,
+			deleteRecipe,
+		]);
+
+		if (!transaction) {
 			res.json({ message: 'Recipe not found' });
 		}
-		res.json({ message: 'Recipe deleted', recipe: recipe });
+		res.json({ message: 'Recipe deleted', transaction: transaction });
 	} catch (err) {
 		console.log(err);
 		res.json({ error: 'Something went wrong' });
