@@ -40,7 +40,7 @@ router.post('/users/wallet', validateAuth, async (req, res) => {
 				id: userId,
 			},
 			data: {
-				wallet: totalWallet,
+				wallet: parseInt(totalWallet),
 			},
 		});
 		return res.json({ success: true, message: 'Wallet updated', user: user });

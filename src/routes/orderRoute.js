@@ -52,7 +52,13 @@ router.post('/order', validateAuth, async (req, res) => {
 		});
 		res.json({ message: 'Order created', order: order, user: updatedUser });
 	} catch (err) {
-		res.json({ message: 'Something went wrong', error: err });
+		res.json({
+			message: 'Something went wrong',
+			error: {
+				err: err,
+				message: err.messge,
+			},
+		});
 	}
 });
 
