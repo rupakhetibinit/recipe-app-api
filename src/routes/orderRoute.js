@@ -11,13 +11,31 @@ router.post('/order', validateAuth, async (req, res) => {
 				id: req.body.userId,
 			},
 		});
+		const recipe = await prisma.recipe.findUnique({
+			where: {
+				id: req.body.recipeId,
+			},
+		});
+		if (!recipe) {
+			return res
+				.json({ success: false, message: 'Recipe not found' })
+				.status(404);
+		}
 
 		if (!user) {
-			return res.json({ success: false, message: 'User not found' });
+			return res
+				.json({ success: false, message: 'User not found' })
+				.status(404);
 		}
 
 		const totalWallet = parseInt(user.wallet) - parseInt(req.body.total);
-		const updatedUser = await prisma.user.update({
+		if (totalWallet < 0) {
+			return res.json({
+				success: false,
+				message: 'Insufficient wallet balance',
+			});
+		}
+		const updatedUser = prisma.user.update({
 			where: {
 				id: req.body.userId,
 			},
@@ -26,7 +44,7 @@ router.post('/order', validateAuth, async (req, res) => {
 			},
 		});
 
-		const order = await prisma.orders.create({
+		const order = prisma.orders.create({
 			data: {
 				recipe: {
 					connect: {
@@ -50,7 +68,14 @@ router.post('/order', validateAuth, async (req, res) => {
 				ingredients: true,
 			},
 		});
-		res.json({ message: 'Order created', order: order, user: updatedUser });
+
+		const transaction = await prisma.$transaction([updatedUser, order]);
+
+		return res.json({
+			message: 'Order created',
+			transaction: transaction,
+			success: true,
+		});
 	} catch (err) {
 		res.json({
 			message: 'Something went wrong',
