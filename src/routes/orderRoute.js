@@ -75,6 +75,8 @@ router.post('/order', validateAuth, async (req, res) => {
 			message: 'Order created',
 			transaction: transaction,
 			success: true,
+			order: order,
+			user: updatedUser,
 		});
 	} catch (err) {
 		res.json({
