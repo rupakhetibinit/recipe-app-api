@@ -115,4 +115,23 @@ router.post('/users/wallet/decrease', validateAuth, async (req, res) => {
 		res.json({ error: 'Something went wrong', message: err.message });
 	}
 });
+
+router.get('/users/wallet/:userId', validateAuth, async (req, res) => {
+	try {
+		const { userId } = req.params;
+		const user = await prisma.user.findUnique({
+			where: {
+				id: userId,
+			},
+		});
+		if (!user) {
+			return res.json({ success: false, message: 'User not found' });
+		}
+		return res.json({ success: true, message: 'Wallet fetched', user: user });
+	} catch (error) {
+		console.log(error);
+		res.json({ error: 'Something went wrong', message: error.message });
+	}
+});
+
 module.exports = router;
