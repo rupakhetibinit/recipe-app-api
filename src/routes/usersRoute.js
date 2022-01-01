@@ -86,4 +86,33 @@ router.post('/users/phone', validateAuth, async (req, res) => {
 	}
 });
 
+router.post('/users/wallet/decrease', validateAuth, async (req, res) => {
+	const { userId, wallet } = req.body;
+	try {
+		const foundUser = await prisma.user.findUnique({
+			where: {
+				id: userId,
+			},
+		});
+		if (!foundUser) {
+			return res.json({ success: false, message: 'User not found' });
+		}
+		const totalWallet = parseInt(foundUser.wallet) - parseInt(wallet);
+		if (totalWallet < 0) {
+			return res.json({ success: false, message: 'Insufficient wallet' });
+		}
+		const user = await prisma.user.update({
+			where: {
+				id: userId,
+			},
+			data: {
+				wallet: totalWallet,
+			},
+		});
+		return res.json({ success: true, message: 'Wallet updated', user: user });
+	} catch (err) {
+		console.log(err);
+		res.json({ error: 'Something went wrong', message: err.message });
+	}
+});
 module.exports = router;
