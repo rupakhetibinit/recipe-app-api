@@ -73,13 +73,31 @@ router.delete('/order/:id', validateAuth, async (req, res) => {
 		if (findOrder === null) {
 			res.json({ message: 'Order not found' });
 		}
+		const user = await prisma.user.findUnique({
+			where: {
+				id: parseInt(findOrder.userId),
+			},
+		});
+		if (user === null) {
+			res.json({ message: 'User not found' });
+		}
+		const totalWallet = parseInt(user.wallet) + parseInt(findOrder.total);
+		const userUpdated = await prisma.user.update({
+			where: {
+				id: parseInt(findOrder.userId),
+			},
+			data: {
+				wallet: totalWallet,
+			},
+		});
+
 		const order = await prisma.orders.delete({
 			where: {
 				id: req.params.id,
 			},
 		});
 
-		res.json({ message: 'Order deleted', order: order });
+		res.json({ message: 'Order deleted', order: order, user: userUpdated });
 	} catch (err) {
 		res.json({ message: 'Something went wrong', error: err });
 	}
