@@ -19,7 +19,7 @@ router.post('/order', validateAuth, async (req, res) => {
 		const totalWallet = parseInt(user.wallet) - parseInt(req.body.total);
 		const updatedUser = await prisma.user.update({
 			where: {
-				id: req.userId,
+				id: req.body.userId,
 			},
 			data: {
 				wallet: totalWallet,
