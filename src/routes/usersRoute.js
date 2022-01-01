@@ -22,4 +22,68 @@ router.get('/users', validateAuth, async (req, res) => {
 	}
 });
 
+router.post('/users/wallet', validateAuth, async (req, res) => {
+	const { userId, wallet } = req.body;
+	try {
+		const foundUser = await prisma.user.findUnique({
+			where: {
+				id: userId,
+			},
+		});
+		if (!foundUser) {
+			return res.json({ success: false, message: 'User not found' });
+		}
+		const totalWallet = parseInt(foundUser.wallet) + parseInt(wallet);
+
+		const user = await prisma.user.update({
+			where: {
+				id: userId,
+			},
+			data: {
+				wallet: totalWallet,
+			},
+		});
+		return res.json({ success: true, message: 'Wallet updated', user: user });
+	} catch (err) {
+		console.log(err);
+		res.json({ error: 'Something went wrong', message: err.message });
+	}
+});
+
+router.post('/users/location', validateAuth, async (req, res) => {
+	const { userId, location } = req.body;
+	try {
+		const user = await prisma.user.update({
+			where: {
+				id: userId,
+			},
+			data: {
+				location: location,
+			},
+		});
+		return res.json({ success: true, message: 'Location updated', user: user });
+	} catch (err) {
+		console.log(err);
+		res.json({ error: 'Something went wrong', message: err.message });
+	}
+});
+
+router.post('/users/phone', validateAuth, async (req, res) => {
+	const { userId, phone } = req.body;
+	try {
+		const user = await prisma.user.update({
+			where: {
+				id: userId,
+			},
+			data: {
+				phone: phone,
+			},
+		});
+		return res.json({ success: true, message: 'Phone updated', user: user });
+	} catch (err) {
+		console.log(err);
+		res.json({ error: 'Something went wrong', message: err.message });
+	}
+});
+
 module.exports = router;

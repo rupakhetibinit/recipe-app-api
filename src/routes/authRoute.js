@@ -53,6 +53,9 @@ router.post('/register', validation(userSchema), async (req, res) => {
 			email: savedUser.email,
 			isAdmin: savedUser.isAdmin,
 			token: accessToken,
+			location: savedUser.location,
+			wallet: savedUser.wallet,
+			phone: savedUser.phone,
 		});
 	} catch (error) {
 		console.log(error);
@@ -102,6 +105,9 @@ router.post('/login', validation(loginSchema), async (req, res) => {
 				accessToken: accessToken,
 				name: user.name,
 				isAdmin: user.isAdmin,
+				location: user.location,
+				wallet: user.wallet,
+				phone: user.phone,
 			});
 		} else {
 			return res.json({
