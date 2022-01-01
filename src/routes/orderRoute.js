@@ -8,7 +8,7 @@ router.post('/order', validateAuth, async (req, res) => {
 	try {
 		const user = await prisma.user.findUnique({
 			where: {
-				id: req.userId,
+				id: req.body.userId,
 			},
 		});
 
