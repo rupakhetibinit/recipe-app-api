@@ -3,6 +3,9 @@ const express = require('express');
 const validateAuth = require('../middlewares/validateAuth');
 const router = express.Router();
 const prisma = new PrismaClient();
+const { Expo } = require('expo-server-sdk');
+
+let expo = new Expo();
 
 router.post('/order', validateAuth, async (req, res) => {
 	try {
@@ -150,6 +153,17 @@ router.delete('/order/:id', validateAuth, async (req, res) => {
 			},
 		});
 
+		await expo.sendPushNotificationsAsync([
+			{
+				to: user.pushNotificationToken,
+				sound: 'default',
+				title: 'Order Cancelled',
+				body: `Your order with ${findOrder.id
+					.split('-')
+					.toUpperCase()}  has been cancelled`,
+			},
+		]);
+
 		res.json({ message: 'Order deleted', order: order, user: userUpdated });
 	} catch (err) {
 		res.json({ message: 'Something went wrong', error: err });
@@ -170,6 +184,17 @@ router.patch('/order/:id', validateAuth, async (req, res) => {
 		if (deliveredOrder === null) {
 			res.json({ message: 'Order not found' });
 		}
+		await expo.sendPushNotificationsAsync([
+			{
+				to: user.pushNotificationToken,
+				sound: 'default',
+				title: 'Order Delivered',
+				body: `Your order with ${deliveredOrder.id
+					.split('-')
+					.toUpperCase()}  has been successfully delivered`,
+			},
+		]);
+
 		res.json({ message: 'Order delivered', order: deliveredOrder });
 	} catch (err) {
 		res.json({ message: 'Something went wrong', error: err });
