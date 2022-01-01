@@ -17,7 +17,7 @@ router.post('/order', validateAuth, async (req, res) => {
 		}
 
 		const totalWallet = parseInt(user.wallet) - parseInt(req.body.total);
-		const user = await prisma.user.update({
+		const updatedUser = await prisma.user.update({
 			where: {
 				id: req.userId,
 			},
@@ -50,7 +50,7 @@ router.post('/order', validateAuth, async (req, res) => {
 				ingredients: true,
 			},
 		});
-		res.json({ message: 'Order created', order: order, user: user });
+		res.json({ message: 'Order created', order: order, user: updatedUser });
 	} catch (err) {
 		res.json({ message: 'Something went wrong', error: err });
 	}
