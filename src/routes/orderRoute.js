@@ -6,6 +6,26 @@ const prisma = new PrismaClient();
 
 router.post('/order', validateAuth, async (req, res) => {
 	try {
+		const user = await prisma.user.findUnique({
+			where: {
+				id: req.userId,
+			},
+		});
+
+		if (!user) {
+			return res.json({ success: false, message: 'User not found' });
+		}
+
+		const totalWallet = parseInt(user.wallet) - parseInt(req.body.total);
+		const user = await prisma.user.update({
+			where: {
+				id: req.userId,
+			},
+			data: {
+				wallet: totalWallet,
+			},
+		});
+
 		const order = await prisma.orders.create({
 			data: {
 				recipe: {
@@ -30,7 +50,7 @@ router.post('/order', validateAuth, async (req, res) => {
 				ingredients: true,
 			},
 		});
-		res.json({ message: 'Order created', order: order });
+		res.json({ message: 'Order created', order: order, user: user });
 	} catch (err) {
 		res.json({ message: 'Something went wrong', error: err });
 	}
