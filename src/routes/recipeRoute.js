@@ -82,6 +82,12 @@ router.delete('/recipes/:id', validateAuth, async (req, res) => {
 				recipeId: parseInt(req.params.id),
 			},
 		});
+
+		const deleteOrders = prisma.orders.deleteMany({
+			where: {
+				recipeId: parseInt(req.params.id),
+			},
+		});
 		const deleteRecipe = prisma.recipe.delete({
 			where: {
 				id: parseInt(req.params.id),
@@ -90,6 +96,7 @@ router.delete('/recipes/:id', validateAuth, async (req, res) => {
 
 		const transaction = await prisma.$transaction([
 			deleteIngredients,
+			deleteOrders,
 			deleteRecipe,
 		]);
 
@@ -99,7 +106,7 @@ router.delete('/recipes/:id', validateAuth, async (req, res) => {
 		res.json({ message: 'Recipe deleted', transaction: transaction });
 	} catch (err) {
 		console.log(err);
-		res.json({ error: 'Something went wrong' });
+		res.json({ error: 'Something went wrong', meta: error.meta });
 	}
 });
 

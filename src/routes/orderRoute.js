@@ -68,7 +68,7 @@ router.post('/order', validateAuth, async (req, res) => {
 				ingredients: true,
 			},
 		});
-
+		console.log(order);
 		const transaction = await prisma.$transaction([updatedUser, order]);
 
 		return res.json({
