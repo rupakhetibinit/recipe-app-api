@@ -43,7 +43,7 @@ router.post('/order', validateAuth, async (req, res) => {
 				id: req.body.userId,
 			},
 			data: {
-				wallet: totalWallet,
+				wallet: user.wallet,
 			},
 		});
 
@@ -181,6 +181,25 @@ router.patch('/order/:id', validateAuth, async (req, res) => {
 				delivered: true,
 			},
 		});
+		const foundUser = await prisma.user.findUnique({
+			where: {
+				id: parseInt(deliveredOrder.userId),
+			},
+		});
+		if (foundUser === null) {
+			return res.json({ message: 'User not found' });
+		}
+
+		const totalWallet = foundUser.wallet - deliveredOrder.total;
+
+		const user = await prisma.user.update({
+			where: {
+				id: parseInt(deliveredOrder.userId),
+			},
+			data: {
+				wallet: totalWallet,
+			},
+		});
 		if (deliveredOrder === null) {
 			res.json({ message: 'Order not found' });
 		}
@@ -195,7 +214,7 @@ router.patch('/order/:id', validateAuth, async (req, res) => {
 			},
 		]);
 
-		res.json({ message: 'Order delivered', order: deliveredOrder });
+		res.json({ message: 'Order delivered', order: deliveredOrder, user: user });
 	} catch (err) {
 		res.json({ message: 'Something went wrong', error: err });
 	}
