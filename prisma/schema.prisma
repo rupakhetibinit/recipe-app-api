@@ -11,58 +11,57 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  name String
-  email String @unique
-  password String
-  isAdmin Boolean @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  likedRecipes Recipe[]
-  orders Orders[]
-  wallet Int @default(0)
-  location String?
-  phone String?
+  id                    Int      @id @default(autoincrement())
+  name                  String
+  email                 String   @unique
+  password              String
+  isAdmin               Boolean  @default(false)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @default(now())
+  likedRecipes          Recipe[]
+  orders                Orders[]
+  wallet                Int      @default(0)
+  location              String?
+  phone                 String?
   pushNotificationToken String?
 }
 
 model Recipe {
-  id Int @id @default(autoincrement())
-  name String
-  imageUrl String
+  id          Int          @id @default(autoincrement())
+  name        String
+  imageUrl    String
   description String
   ingredients Ingredient[]
-  steps String[]
-  likedBy User[]
-  servings Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  Orders Orders[]
+  steps       String[]
+  likedBy     User[]
+  servings    Int
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now())
+  Orders      Orders[]
 }
 
 model Ingredient {
-  id Int @id @default(autoincrement())
-  name String
+  id          Int      @id @default(autoincrement())
+  name        String
   measurement String
-  amount Int
-  price Int
-  recipeId Int
-  recipe Recipe @relation(fields: [recipeId], references: [id])
-  orders Orders[] 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  amount      Int
+  price       Int
+  recipeId    Int
+  recipe      Recipe   @relation(fields: [recipeId], references: [id])
+  orders      Orders[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
 }
 
 model Orders {
-  id String @id @unique
-  userId Int
-  recipeId Int
-  user User @relation(fields: [userId], references: [id])
-  recipe Recipe @relation(fields: [recipeId], references: [id])
+  id          String       @id @unique
+  userId      Int
+  recipeId    Int
+  user        User         @relation(fields: [userId], references: [id])
+  recipe      Recipe       @relation(fields: [recipeId], references: [id])
   ingredients Ingredient[]
-  total Int
-  delivered Boolean @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  total       Int
+  delivered   Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now())
 }
-

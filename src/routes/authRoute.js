@@ -16,7 +16,7 @@ const validation = require('../middlewares/validationMiddleware');
 
 router.post('/register', validation(userSchema), async (req, res) => {
 	try {
-		const { name, email, password, isAdmin, pushNotificationToken } = req.body;
+		const { name, email, password, isAdmin } = req.body;
 		const hashedPassword = await bcrypt.hash(password, saltRounds);
 		const user = await prisma.user.findUnique({
 			where: {
@@ -36,7 +36,6 @@ router.post('/register', validation(userSchema), async (req, res) => {
 				email: email,
 				password: hashedPassword,
 				isAdmin: isAdmin,
-				pushNotificationToken: pushNotificationToken,
 			},
 		});
 
@@ -57,7 +56,6 @@ router.post('/register', validation(userSchema), async (req, res) => {
 			location: savedUser.location,
 			wallet: savedUser.wallet,
 			phone: savedUser.phone,
-			pushNotificationToken: savedUser.pushNotificationToken,
 		});
 	} catch (error) {
 		console.log(error);
@@ -110,7 +108,6 @@ router.post('/login', validation(loginSchema), async (req, res) => {
 				location: user.location,
 				wallet: user.wallet,
 				phone: user.phone,
-				pushNotificationToken: user.pushNotificationToken,
 			});
 		} else {
 			return res.json({

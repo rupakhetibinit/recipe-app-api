@@ -134,6 +134,7 @@ router.delete('/order/:id', validateAuth, async (req, res) => {
 				id: parseInt(findOrder.userId),
 			},
 		});
+
 		if (user === null) {
 			res.json({ message: 'User not found' });
 		}
@@ -152,17 +153,6 @@ router.delete('/order/:id', validateAuth, async (req, res) => {
 				id: req.params.id,
 			},
 		});
-
-		await expo.sendPushNotificationsAsync([
-			{
-				to: user.pushNotificationToken,
-				sound: 'default',
-				title: 'Order Cancelled',
-				body: `Your order with ${findOrder.id
-					.split('-')
-					.toUpperCase()}  has been cancelled`,
-			},
-		]);
 
 		res.json({ message: 'Order deleted', order: order, user: userUpdated });
 	} catch (err) {
@@ -189,7 +179,12 @@ router.patch('/order/:id', validateAuth, async (req, res) => {
 		if (foundUser === null) {
 			return res.json({ message: 'User not found' });
 		}
-
+		if (foundUser.wallet < deliveredOrder.total) {
+			return res.json({
+				success: false,
+				message: 'Insufficient wallet balance',
+			});
+		}
 		const totalWallet = foundUser.wallet - deliveredOrder.total;
 
 		const user = await prisma.user.update({
