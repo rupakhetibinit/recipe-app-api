@@ -141,4 +141,25 @@ router.get('/users/wallet/:userId', validateAuth, async (req, res) => {
 	}
 });
 
+router.patch('/users/update', async (req, res) => {
+	const { userId, name, email, phone, location } = req.body;
+	try {
+		const user = await prisma.user.update({
+			where: {
+				id: userId,
+			},
+			data: {
+				name,
+				email,
+				phone,
+				location,
+			},
+		});
+		return res.json({ success: true, message: 'User updated', user: user });
+	} catch (err) {
+		console.log(err);
+		res.json({ error: 'Something went wrong', message: err.message });
+	}
+});
+
 module.exports = router;
