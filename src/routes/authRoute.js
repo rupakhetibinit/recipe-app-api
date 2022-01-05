@@ -110,10 +110,12 @@ router.post('/login', validation(loginSchema), async (req, res) => {
 				phone: user.phone,
 			});
 		} else {
-			return res.json({
-				success: false,
-				error: `Error email or password doesn't match`,
-			});
+			return res
+				.json({
+					success: false,
+					error: `Error email or password doesn't match`,
+				})
+				.status(401);
 		}
 	} catch (error) {
 		console.log(error);
