@@ -123,4 +123,69 @@ router.post('/login', validation(loginSchema), async (req, res) => {
 	}
 });
 
+router.get('/token', async (req, res) => {
+	try {
+		const token =
+			req.headers.authorization && req.headers.authorization.split(' ')[1];
+		if (!token) {
+			return res.status(401).json({
+				success: false,
+				error: 'Token not found',
+			});
+		}
+		const decoded = jwt.verify(
+			token,
+			process.env.JWT_ACCESS_SECRET || 'secretaccess'
+		);
+		const user = await prisma.user.findUnique({
+			where: {
+				email: decoded.email,
+			},
+		});
+		if (!user) {
+			return res.status(404).json({
+				success: false,
+				error: 'User not found',
+			});
+		}
+		const accessToken = jwt.sign(
+			{ email: user.email, isAdmin: user.isAdmin },
+			process.env.JWT_ACCESS_SECRET || 'secretaccess',
+			{
+				expiresIn: process.env.JWT_ACCESS_TIME || '30d',
+			}
+		);
+
+		return res.status(200).json({
+			userId: user.id,
+			success: true,
+			email: user.email,
+			name: user.name,
+			isAdmin: user.isAdmin,
+			location: user.location,
+			wallet: user.wallet,
+			phone: user.phone,
+			token: accessToken,
+		});
+	} catch (error) {
+		console.log(error);
+		if (error instanceof jwt.TokenExpiredError) {
+			return res.status(401).json({
+				success: false,
+				error: 'Token expired',
+			});
+		}
+		if (error instanceof jwt.JsonWebTokenError) {
+			return res.status(401).json({
+				success: false,
+				error: 'Invalid token',
+			});
+		}
+		return res.status(500).json({
+			success: false,
+			error: 'Internal Server Error',
+		});
+	}
+});
+
 module.exports = router;
