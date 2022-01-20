@@ -75,10 +75,7 @@ router.post('/login', validation(loginSchema), async (req, res) => {
 		});
 		if (!user) {
 			console.log('User not found');
-			return res.status(404).json({
-				success: false,
-				error: 'User not found',
-			});
+			return res.status(404).send({ message: 'User not found' });
 		}
 		const isAdmin = user.isAdmin;
 		const success = await bcrypt.compare(password, user.password);

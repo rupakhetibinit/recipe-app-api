@@ -41,7 +41,7 @@ router.post('/recipes/:id/like', async (req, res) => {
 		res.json({ message: 'Recipe liked', like: like });
 	} catch (err) {
 		console.log(err);
-		res.json({ error: 'Something went wrong', err: err, message: err.message });
+		res.json({ error: err, message: 'Something went wrong' });
 	}
 });
 
@@ -54,7 +54,7 @@ router.patch('/recipes/:id/like', async (req, res) => {
 			},
 		});
 		if (!recipe) {
-			res.json({ message: 'Recipe not found' });
+			res.status(404).json({ message: 'Recipe not found' });
 		}
 		const user = await prisma.user.findUnique({
 			where: {
@@ -62,7 +62,7 @@ router.patch('/recipes/:id/like', async (req, res) => {
 			},
 		});
 		if (!user) {
-			res.json({ message: 'User not found' });
+			res.status(404).json({ message: 'User not found' });
 		}
 		const dislike = await prisma.recipe.update({
 			where: {
@@ -82,6 +82,9 @@ router.patch('/recipes/:id/like', async (req, res) => {
 		res.json({ message: 'Recipe disliked', dislike: dislike });
 	} catch (err) {
 		console.log(err);
+		return res
+			.status(500)
+			.json({ message: 'Something went wrong, please try again later' });
 	}
 });
 
@@ -105,7 +108,7 @@ router.get('/user/liked/:id', async (req, res) => {
 			},
 		});
 		if (!recipes) {
-			res.json({ message: 'Recipe not found' });
+			res.status(404).json({ message: 'Recipe not found' });
 		}
 		res.status(200).json({ message: 'Liked Recipes', recipes: recipes });
 	} catch (err) {
