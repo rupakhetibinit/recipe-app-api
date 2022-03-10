@@ -58,13 +58,21 @@ router.delete('/reviews/:reviewId', validateAuth, async (req, res) => {
 	try {
 		const findReview = await prisma.review.findUnique({
 			where: {
-				id: req.params.reviewId,
+				id: parseInt(req.params.reviewId),
 			},
 		});
+		if (!findReview) {
+			return res.json({ success: false, message: 'Review not found' });
+		}
 		const review = await prisma.review.delete({
 			where: {
 				id: findReview.id,
 			},
+		});
+		return res.json({
+			success: true,
+			message: 'Review Deleted',
+			deletedReview: review,
 		});
 	} catch (error) {
 		console.log(error);
