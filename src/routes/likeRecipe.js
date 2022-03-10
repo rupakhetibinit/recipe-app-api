@@ -12,7 +12,7 @@ router.post('/recipes/:id/like', async (req, res) => {
 			},
 		});
 		if (!recipe) {
-			res.json({ message: 'Recipe not found' });
+			res.json({ success: false, message: 'Recipe not found' });
 		}
 		const user = await prisma.user.findUnique({
 			where: {
@@ -20,7 +20,7 @@ router.post('/recipes/:id/like', async (req, res) => {
 			},
 		});
 		if (!user) {
-			res.json({ message: 'User not found' });
+			res.json({ success: false, message: 'User not found' });
 		}
 		const like = await prisma.recipe.update({
 			where: {
@@ -38,10 +38,13 @@ router.post('/recipes/:id/like', async (req, res) => {
 			},
 		});
 
-		res.json({ message: 'Recipe liked', like: like });
+		res.json({ success: true, message: 'Recipe liked', like: like });
 	} catch (err) {
-		console.log(err);
-		res.json({ error: err, message: 'Something went wrong' });
+		// console.log(err);
+		res.json({
+			success: false,
+			message: 'Something went wrong please try again later',
+		});
 	}
 });
 
@@ -54,7 +57,7 @@ router.patch('/recipes/:id/like', async (req, res) => {
 			},
 		});
 		if (!recipe) {
-			res.status(404).json({ message: 'Recipe not found' });
+			res.json({ success: false, message: 'Recipe not found' });
 		}
 		const user = await prisma.user.findUnique({
 			where: {
@@ -62,7 +65,7 @@ router.patch('/recipes/:id/like', async (req, res) => {
 			},
 		});
 		if (!user) {
-			res.status(404).json({ message: 'User not found' });
+			res.json({ success: false, message: 'User not found' });
 		}
 		const dislike = await prisma.recipe.update({
 			where: {
@@ -79,12 +82,13 @@ router.patch('/recipes/:id/like', async (req, res) => {
 				likedBy: true,
 			},
 		});
-		res.json({ message: 'Recipe disliked', dislike: dislike });
+		res.json({ success: true, message: 'Recipe disliked', dislike: dislike });
 	} catch (err) {
 		console.log(err);
-		return res
-			.status(500)
-			.json({ message: 'Something went wrong, please try again later' });
+		return res.json({
+			success: false,
+			message: 'Something went wrong, please try again later',
+		});
 	}
 });
 
@@ -108,9 +112,9 @@ router.get('/user/liked/:id', async (req, res) => {
 			},
 		});
 		if (!recipes) {
-			res.status(404).json({ message: 'Recipe not found' });
+			res.json({ success: false, message: 'Recipe not found' });
 		}
-		res.status(200).json({ message: 'Liked Recipes', recipes: recipes });
+		res.json({ success: true, message: 'Liked Recipes', recipes: recipes });
 	} catch (err) {
 		console.log(err);
 	}

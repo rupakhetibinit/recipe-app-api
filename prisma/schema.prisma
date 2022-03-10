@@ -24,6 +24,7 @@ model User {
   location              String?
   phone                 String?
   pushNotificationToken String?
+  Review                Review[]
 }
 
 model Recipe {
@@ -38,6 +39,7 @@ model Recipe {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @default(now())
   Orders      Orders[]
+  reviews     Review[]
 }
 
 model Ingredient {
@@ -64,4 +66,16 @@ model Orders {
   delivered   Boolean      @default(false)
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @default(now())
+}
+
+model Review {
+  id        Int      @id @unique @default(autoincrement())
+  userId    Int
+  recipeId  Int
+  user      User     @relation(fields: [userId], references: [id])
+  recipe    Recipe   @relation(fields: [recipeId], references: [id])
+  rating    Int
+  review    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 }

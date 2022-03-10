@@ -75,7 +75,7 @@ router.post('/login', validation(loginSchema), async (req, res) => {
 		});
 		if (!user) {
 			console.log('User not found');
-			return res.status(404).send({ message: 'User not found' });
+			return res.send({ success: false, message: 'User not found' });
 		}
 		const isAdmin = user.isAdmin;
 		const success = await bcrypt.compare(password, user.password);
@@ -96,8 +96,8 @@ router.post('/login', validation(loginSchema), async (req, res) => {
 			);
 
 			return res.json({
-				userId: user.id,
 				success: true,
+				userId: user.id,
 				email: user.email,
 				accessToken: accessToken,
 				name: user.name,
@@ -125,7 +125,7 @@ router.get('/token', async (req, res) => {
 		const token =
 			req.headers.authorization && req.headers.authorization.split(' ')[1];
 		if (!token) {
-			return res.status(401).json({
+			return res.json({
 				success: false,
 				error: 'Token not found',
 			});
@@ -140,7 +140,7 @@ router.get('/token', async (req, res) => {
 			},
 		});
 		if (!user) {
-			return res.status(404).json({
+			return res.json({
 				success: false,
 				error: 'User not found',
 			});
@@ -154,8 +154,8 @@ router.get('/token', async (req, res) => {
 		);
 
 		return res.status(200).json({
-			userId: user.id,
 			success: true,
+			userId: user.id,
 			email: user.email,
 			name: user.name,
 			isAdmin: user.isAdmin,
@@ -167,13 +167,13 @@ router.get('/token', async (req, res) => {
 	} catch (error) {
 		console.log(error);
 		if (error instanceof jwt.TokenExpiredError) {
-			return res.status(401).json({
+			return res.json({
 				success: false,
 				error: 'Token expired',
 			});
 		}
 		if (error instanceof jwt.JsonWebTokenError) {
-			return res.status(401).json({
+			return res.json({
 				success: false,
 				error: 'Invalid token',
 			});

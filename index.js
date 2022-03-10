@@ -5,6 +5,7 @@ const recipeRoute = require('./src/routes/recipeRoute');
 const likeRecipe = require('./src/routes/likeRecipe');
 const orderRoute = require('./src/routes/orderRoute');
 const usersRoute = require('./src/routes/usersRoute');
+const ratingRoute = require('./src/routes/ratingRoute');
 const cors = require('cors');
 const app = express();
 const validateAuth = require('./src/middlewares/validateAuth');
@@ -68,6 +69,7 @@ app.use('/api/v1', cors(), recipeRoute);
 app.use('/api/v1', cors(), likeRecipe);
 app.use('/api/v1', cors(), orderRoute);
 app.use('/api/v1', cors(), usersRoute);
+app.use('/api/v1', cors(), ratingRoute);
 
 app.listen(port, () => {
 	console.log(`Server is running on ${process.env.PORT}`);
