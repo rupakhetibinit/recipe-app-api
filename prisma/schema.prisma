@@ -25,6 +25,7 @@ model User {
   phone                 String?
   pushNotificationToken String?
   Review                Review[]
+  verified              Boolean  @default(false)
 }
 
 model Recipe {

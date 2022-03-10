@@ -14,6 +14,12 @@ const validation = require('../middlewares/validationMiddleware');
 
 // Register
 
+function encodeRegistrationToken(email) {
+	let info = { email: email };
+	const token = jwt.sign(info, 'MYSECRETKEY');
+	return token;
+}
+
 router.post('/register', validation(userSchema), async (req, res) => {
 	try {
 		const { name, email, password, isAdmin } = req.body;
@@ -46,6 +52,8 @@ router.post('/register', validation(userSchema), async (req, res) => {
 				expiresIn: process.env.JWT_ACCESS_TIME || '30d',
 			}
 		);
+
+		const verificationToken = encodeRegistrationToken(savedUser.email);
 		return res.status(201).json({
 			success: true,
 			userId: savedUser.id,
@@ -56,6 +64,8 @@ router.post('/register', validation(userSchema), async (req, res) => {
 			location: savedUser.location,
 			wallet: savedUser.wallet,
 			phone: savedUser.phone,
+			verified: savedUser.verified,
+			verificationToken: verificationToken,
 		});
 	} catch (error) {
 		console.log(error);
