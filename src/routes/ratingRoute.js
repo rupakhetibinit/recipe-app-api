@@ -89,7 +89,9 @@ router.patch('/reviews/:reviewId', validateAuth, async (req, res) => {
 			},
 		});
 		return res.json({ success: true, updatedReview });
-	} catch (error) {}
+	} catch (error) {
+		console.log(error);
+	}
 });
 
 module.exports = router;
