@@ -58,7 +58,11 @@ router.get('/recipes/:id', validateAuth, async (req, res) => {
 			include: {
 				ingredients: true,
 				likedBy: true,
-				reviews: true,
+				reviews: {
+					include: {
+						user: true,
+					},
+				},
 				_count: {
 					select: {
 						likedBy: true,
@@ -66,10 +70,14 @@ router.get('/recipes/:id', validateAuth, async (req, res) => {
 				},
 			},
 		});
+
 		if (!recipe) {
 			res.json({ message: 'Recipe not found' });
 		}
-		return res.json({ message: 'Recipe fetched', recipe: recipe });
+		return res.json({
+			message: 'Recipe fetched',
+			recipe: recipe,
+		});
 	} catch (err) {
 		console.log(err);
 		return res.json({ error: 'Something went wrong', err: err });
