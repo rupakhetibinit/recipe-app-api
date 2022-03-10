@@ -11,7 +11,7 @@ router.post('/reviews', validateAuth, async (req, res) => {
 				id: req.body.userId,
 			},
 		});
-		const recipe = await prisma.user.findUnique({
+		const recipe = await prisma.recipe.findUnique({
 			where: {
 				id: req.body.recipeId,
 			},
@@ -36,7 +36,7 @@ router.post('/reviews', validateAuth, async (req, res) => {
 				},
 				user: {
 					connect: {
-						id: req.body.recipeId,
+						id: req.body.userId,
 					},
 				},
 				rating: req.body.rating,
