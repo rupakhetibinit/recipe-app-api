@@ -59,7 +59,7 @@ router.post('/register', validation(userSchema), async (req, res) => {
 			to: savedUser.email,
 			subject: 'Verification Code',
 			text: 'Here is your verification code',
-			html: `<b>This is your code ${verificationToken}`,
+			html: `<b>This is your code ${verificationCode}`,
 		});
 
 		const sentVerificationCode = await prisma.otp.create({
@@ -234,6 +234,12 @@ router.post('/token', async (req, res) => {
 			});
 		}
 
+		const updatedUser = prisma.user.update({
+			data: {
+				verified: true,
+			},
+		});
+
 		const accessToken = jwt.sign(
 			{ email, isAdmin },
 			process.env.JWT_ACCESS_SECRET || 'secretaccess',
@@ -244,18 +250,30 @@ router.post('/token', async (req, res) => {
 
 		return res.status(200).json({
 			success: true,
-			userId: otp.user.id,
-			name: otp.user.name,
-			email: otp.user.email,
-			isAdmin: otp.user.isAdmin,
+			userId: updatedUser.id,
+			name: updatedUser.name,
+			email: updatedUser.email,
+			isAdmin: updatedUser.isAdmin,
 			token: accessToken,
-			location: otp.user.location,
-			wallet: otp.user.wallet,
-			phone: otp.user.phone,
-			verified: otp.user.verified,
+			location: updatedUser.location,
+			wallet: updatedUser.wallet,
+			phone: updatedUser.phone,
+			verified: updatedUser.verified,
 		});
 	} catch (error) {
 		return res.json({ success: false, message: 'Failure. Please login again' });
+	}
+});
+
+router.post('/resend', async (req, res) => {
+	try {
+		const user = prisma.user.update({
+			data: {
+				verif,
+			},
+		});
+	} catch (error) {
+		return res.json({ success: false, message: 'Something went wrong' });
 	}
 });
 
