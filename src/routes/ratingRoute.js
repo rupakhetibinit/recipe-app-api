@@ -76,7 +76,7 @@ router.patch('/reviews/:reviewId', validateAuth, async (req, res) => {
 	try {
 		const findReview = await prisma.review.findUnique({
 			where: {
-				id: req.params.reviewId,
+				id: parseInt(req.params.reviewId),
 			},
 		});
 		const updatedReview = prisma.review.update({
