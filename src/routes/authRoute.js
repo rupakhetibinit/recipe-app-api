@@ -8,17 +8,12 @@ const loginSchema = require('../validations/loginSchema');
 const dotenv = require('dotenv');
 const prisma = new PrismaClient();
 const router = express.Router();
+const transporter = require('../nodemailer');
 dotenv.config();
 const saltRounds = parseInt(process.env.SALT_ROUNDS || '10');
 const validation = require('../middlewares/validationMiddleware');
-
+const otpGenerator = require('otp-generator');
 // Register
-
-function encodeRegistrationToken(email) {
-	let info = { email: email };
-	const token = jwt.sign(info, 'MYSECRETKEY');
-	return token;
-}
 
 router.post('/register', validation(userSchema), async (req, res) => {
 	try {
@@ -53,7 +48,31 @@ router.post('/register', validation(userSchema), async (req, res) => {
 			}
 		);
 
-		const verificationToken = encodeRegistrationToken(savedUser.email);
+		const verificationCode = otpGenerator.generate(4, {
+			lowerCaseAlphabets: false,
+			specialChars: false,
+			upperCaseAlphabets: false,
+		});
+
+		let info = await transporter.sendMail({
+			from: `Recipe To Home <recipetohome@company.com>`,
+			to: savedUser.email,
+			subject: 'Verification Code',
+			text: 'Here is your verification code',
+			html: `<b>This is your code ${verificationToken}`,
+		});
+
+		const sentVerificationCode = await prisma.otp.create({
+			data: {
+				user: {
+					connect: {
+						id: savedUser.id,
+					},
+				},
+				verificationCode: verificationCode,
+			},
+		});
+		console.log(info);
 		return res.status(201).json({
 			success: true,
 			userId: savedUser.id,
@@ -65,7 +84,7 @@ router.post('/register', validation(userSchema), async (req, res) => {
 			wallet: savedUser.wallet,
 			phone: savedUser.phone,
 			verified: savedUser.verified,
-			verificationToken: verificationToken,
+			verificationCode: verificationCode,
 		});
 	} catch (error) {
 		console.log(error);
@@ -192,6 +211,51 @@ router.get('/token', async (req, res) => {
 			success: false,
 			error: 'Internal Server Error',
 		});
+	}
+});
+
+router.post('/token', async (req, res) => {
+	try {
+		const { token } = req.body;
+
+		const otp = await prisma.otp.findUnique({
+			where: {
+				verificationCode: token,
+			},
+			select: {
+				user: true,
+			},
+		});
+
+		if (!otp) {
+			return res.status(403).json({
+				success: false,
+				error: 'Failed to verify',
+			});
+		}
+
+		const accessToken = jwt.sign(
+			{ email, isAdmin },
+			process.env.JWT_ACCESS_SECRET || 'secretaccess',
+			{
+				expiresIn: process.env.JWT_ACCESS_TIME || '30d',
+			}
+		);
+
+		return res.status(200).json({
+			success: true,
+			userId: otp.user.id,
+			name: otp.user.name,
+			email: otp.user.email,
+			isAdmin: otp.user.isAdmin,
+			token: accessToken,
+			location: otp.user.location,
+			wallet: otp.user.wallet,
+			phone: otp.user.phone,
+			verified: otp.user.verified,
+		});
+	} catch (error) {
+		return res.json({ success: false, message: 'Failure. Please login again' });
 	}
 });
 
