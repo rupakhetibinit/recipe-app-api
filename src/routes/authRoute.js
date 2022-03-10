@@ -69,7 +69,7 @@ router.post('/register', validation(userSchema), async (req, res) => {
 						id: savedUser.id,
 					},
 				},
-				verificationCode: verificationCode,
+				verificationCode: parseInt(verificationCode),
 			},
 		});
 		console.log(info);
