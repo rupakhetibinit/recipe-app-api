@@ -79,6 +79,9 @@ router.patch('/reviews/:reviewId', validateAuth, async (req, res) => {
 				id: parseInt(req.params.reviewId),
 			},
 		});
+		if (!findReview) {
+			return res.json({ success: false, message: 'Not Found' });
+		}
 		const updatedReview = prisma.review.update({
 			where: {
 				id: parseInt(req.params.reviewId),
