@@ -234,7 +234,7 @@ router.post('/token', async (req, res) => {
 			});
 		}
 
-		const updatedUser = prisma.user.update({
+		const updatedUser = await prisma.user.update({
 			data: {
 				verified: true,
 			},
@@ -267,11 +267,20 @@ router.post('/token', async (req, res) => {
 
 router.post('/resend', async (req, res) => {
 	try {
+		const verificationCode = otpGenerator.generate(4, {
+			lowerCaseAlphabets: false,
+			specialChars: false,
+			upperCaseAlphabets: false,
+		});
 		const user = prisma.user.update({
+			where: {
+				email: req.body.email,
+			},
 			data: {
-				verif,
+				verificationCode: verificationCode,
 			},
 		});
+		return res.json({ success: true, message: 'successful' });
 	} catch (error) {
 		return res.json({ success: false, message: 'Something went wrong' });
 	}
