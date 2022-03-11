@@ -220,7 +220,7 @@ router.post('/token', async (req, res) => {
 
 		const otp = await prisma.otp.findUnique({
 			where: {
-				verificationCode: token,
+				verificationCode: parseInt(token),
 			},
 			select: {
 				user: true,
