@@ -261,6 +261,7 @@ router.post('/token', async (req, res) => {
 			verified: updatedUser.verified,
 		});
 	} catch (error) {
+		console.log(error);
 		return res.json({ success: false, message: 'Failure. Please login again' });
 	}
 });
@@ -282,6 +283,7 @@ router.post('/resend', async (req, res) => {
 		});
 		return res.json({ success: true, message: 'successful' });
 	} catch (error) {
+		console.log(error);
 		return res.json({ success: false, message: 'Something went wrong' });
 	}
 });
