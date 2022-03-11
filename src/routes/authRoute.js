@@ -278,9 +278,17 @@ router.post('/resend', async (req, res) => {
 				email: req.body.email,
 			},
 			data: {
-				verificationCode: verificationCode,
+				verificationCode: parseInt(verificationCode),
 			},
 		});
+		let info = await transporter.sendMail({
+			from: `Recipe To Home <recipetohome@company.com>`,
+			to: req.body.email,
+			subject: 'Verification Code',
+			text: 'Here is your verification code',
+			html: `<b>This is your code ${verificationCode}`,
+		});
+		console.log(info);
 		return res.json({ success: true, message: 'successful' });
 	} catch (error) {
 		console.log(error);
