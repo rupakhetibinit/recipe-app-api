@@ -243,7 +243,8 @@ router.post('/token', async (req, res) => {
 				verified: true,
 			},
 		});
-
+		const email = otp.user.email;
+		const isAdmin = otp.user.isAdmin;
 		const accessToken = jwt.sign(
 			{ email, isAdmin },
 			process.env.JWT_ACCESS_SECRET || 'secretaccess',
