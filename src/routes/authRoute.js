@@ -235,6 +235,9 @@ router.post('/token', async (req, res) => {
 		}
 
 		const updatedUser = await prisma.user.update({
+			where: {
+				email: otp.user.email,
+			},
 			data: {
 				verified: true,
 			},
