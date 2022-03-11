@@ -233,6 +233,7 @@ router.post('/token', async (req, res) => {
 				error: 'Failed to verify',
 			});
 		}
+		console.log(otp);
 
 		const updatedUser = await prisma.user.update({
 			where: {
