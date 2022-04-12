@@ -316,7 +316,7 @@ router.post('/resend', async (req, res) => {
 			process.env.REDIRECT_URI
 		);
 
-		OAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
+		OAuth2Client.setCredentials({ refresh_token: process.env.CLIENT_REFRESHTOKEN });
 		const gmailAccessToken = await OAuth2Client.getAccessToken();
 
 		const transporter = nodemailer.createTransport({
