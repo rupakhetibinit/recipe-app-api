@@ -8,7 +8,9 @@ const loginSchema = require('../validations/loginSchema');
 const dotenv = require('dotenv');
 const prisma = new PrismaClient();
 const router = express.Router();
-const transporter = require('../nodemailer');
+const nodemailer = require('nodemailer');
+const { google } = require('googleapis');
+// const transporter = require('../nodemailer');
 dotenv.config();
 const saltRounds = parseInt(process.env.SALT_ROUNDS || '10');
 const validation = require('../middlewares/validationMiddleware');
@@ -52,6 +54,27 @@ router.post('/register', validation(userSchema), async (req, res) => {
 			lowerCaseAlphabets: false,
 			specialChars: false,
 			upperCaseAlphabets: false,
+		});
+
+		const OAuth2Client = new google.auth.OAuth2(
+			process.env.CLIENT_ID,
+			process.env.CLIENT_SECRET,
+			process.env.REDIRECT_URI
+		);
+
+		OAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
+		const gmailAccessToken = await OAuth2Client.getAccessToken();
+
+		const transporter = nodemailer.createTransport({
+			service: 'gmail',
+			auth: {
+				type: 'OAuth2',
+				user: process.env.CLIENT_EMAIL,
+				clientId: process.env.CLIENT_ID,
+				clientSecret: process.env.CLIENT_SECRET,
+				refreshToken: process.env.CLIENT_REFRESHTOKEN,
+				accessToken: gmailAccessToken,
+			},
 		});
 
 		let info = await transporter.sendMail({
@@ -286,6 +309,28 @@ router.post('/resend', async (req, res) => {
 				verificationCode: parseInt(verificationCode),
 			},
 		});
+
+		const OAuth2Client = new google.auth.OAuth2(
+			process.env.CLIENT_ID,
+			process.env.CLIENT_SECRET,
+			process.env.REDIRECT_URI
+		);
+
+		OAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
+		const gmailAccessToken = await OAuth2Client.getAccessToken();
+
+		const transporter = nodemailer.createTransport({
+			service: 'gmail',
+			auth: {
+				type: 'OAuth2',
+				user: process.env.CLIENT_EMAIL,
+				clientId: process.env.CLIENT_ID,
+				clientSecret: process.env.CLIENT_SECRET,
+				refreshToken: process.env.CLIENT_REFRESHTOKEN,
+				accessToken: gmailAccessToken,
+			},
+		});
+
 		let info = await transporter.sendMail({
 			from: `Recipe To Home <recipetohome@company.com>`,
 			to: req.body.email,
