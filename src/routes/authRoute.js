@@ -26,7 +26,7 @@ router.post('/register', validation(userSchema), async (req, res) => {
 				email: email,
 			},
 		});
-		if (user) {
+		if (user && user.verified===true) {
 			return res.status(403).json({
 				success: false,
 				error: 'User with email already exists',
