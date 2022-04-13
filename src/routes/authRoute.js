@@ -26,7 +26,7 @@ router.post('/register', validation(userSchema), async (req, res) => {
 				email: email,
 			},
 		});
-		if (user && user.verified===true) {
+		if (user) {
 			return res.status(403).json({
 				success: false,
 				error: 'User with email already exists',
@@ -62,7 +62,9 @@ router.post('/register', validation(userSchema), async (req, res) => {
 			process.env.REDIRECT_URI
 		);
 
-		OAuth2Client.setCredentials({ refresh_token: process.env.CLIENT_REFRESHTOKEN });
+		OAuth2Client.setCredentials({
+			refresh_token: process.env.CLIENT_REFRESHTOKEN,
+		});
 		const gmailAccessToken = await OAuth2Client.getAccessToken();
 
 		const transporter = nodemailer.createTransport({
@@ -85,17 +87,14 @@ router.post('/register', validation(userSchema), async (req, res) => {
 			html: `<b>This is your code ${verificationCode}`,
 		});
 
-		const sentVerificationCode = await prisma.otp.create({
+		await prisma.user.update({
+			where: {
+				email: email,
+			},
 			data: {
-				user: {
-					connect: {
-						id: savedUser.id,
-					},
-				},
-				verificationCode: parseInt(verificationCode),
+				Otp: parseInt(verificationCode),
 			},
 		});
-		console.log(info);
 		return res.status(201).json({
 			success: true,
 			userId: savedUser.id,
@@ -137,13 +136,6 @@ router.post('/login', validation(loginSchema), async (req, res) => {
 				process.env.JWT_ACCESS_SECRET || 'secretaccess',
 				{
 					expiresIn: process.env.JWT_ACCESS_TIME || '30d',
-				}
-			);
-			const refreshToken = jwt.sign(
-				{ email, isAdmin },
-				process.env.JWT_REFRESH_SECRET || 'secretrefresh',
-				{
-					expiresIn: process.env.JWT_REFRESH_TIME || '30d',
 				}
 			);
 
@@ -239,16 +231,14 @@ router.get('/token', async (req, res) => {
 
 router.post('/token', async (req, res) => {
 	try {
-		const { token } = req.body;
+		const { token, email } = req.body;
 
-		const otp = await prisma.otp.findUnique({
+		const user = await prisma.user.findUnique({
 			where: {
-				verificationCode: parseInt(token),
-			},
-			select: {
-				user: true,
+				email: email,
 			},
 		});
+		const otp = user.Otp;
 
 		if (!otp) {
 			return res.status(403).json({
@@ -260,14 +250,13 @@ router.post('/token', async (req, res) => {
 
 		const updatedUser = await prisma.user.update({
 			where: {
-				email: otp.user.email,
+				email: user.email,
 			},
 			data: {
 				verified: true,
 			},
 		});
-		const email = otp.user.email;
-		const isAdmin = otp.user.isAdmin;
+		const isAdmin = user.isAdmin;
 		const accessToken = jwt.sign(
 			{ email, isAdmin },
 			process.env.JWT_ACCESS_SECRET || 'secretaccess',
@@ -295,6 +284,7 @@ router.post('/token', async (req, res) => {
 });
 
 router.post('/resend', async (req, res) => {
+	const { email } = req.body;
 	try {
 		const verificationCode = otpGenerator.generate(4, {
 			lowerCaseAlphabets: false,
@@ -303,10 +293,10 @@ router.post('/resend', async (req, res) => {
 		});
 		const user = prisma.user.update({
 			where: {
-				email: req.body.email,
+				email: email,
 			},
 			data: {
-				verificationCode: parseInt(verificationCode),
+				Otp: parseInt(verificationCode),
 			},
 		});
 
@@ -316,7 +306,9 @@ router.post('/resend', async (req, res) => {
 			process.env.REDIRECT_URI
 		);
 
-		OAuth2Client.setCredentials({ refresh_token: process.env.CLIENT_REFRESHTOKEN });
+		OAuth2Client.setCredentials({
+			refresh_token: process.env.CLIENT_REFRESHTOKEN,
+		});
 		const gmailAccessToken = await OAuth2Client.getAccessToken();
 
 		const transporter = nodemailer.createTransport({

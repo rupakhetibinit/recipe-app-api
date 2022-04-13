@@ -5,15 +5,16 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 router.post('/reviews', validateAuth, async (req, res) => {
+	const { userId, recipeId, rating, review } = req.body;
 	try {
 		const user = await prisma.user.findUnique({
 			where: {
-				id: req.body.userId,
+				id: parseInt(userId),
 			},
 		});
 		const recipe = await prisma.recipe.findUnique({
 			where: {
-				id: req.body.recipeId,
+				id: parseInt(recipeId),
 			},
 		});
 		if (!recipe) {
@@ -27,27 +28,27 @@ router.post('/reviews', validateAuth, async (req, res) => {
 				.json({ success: false, message: 'User not found' })
 				.status(404);
 		}
-		const review = await prisma.review.create({
+		const newReview = await prisma.review.create({
 			data: {
 				recipe: {
 					connect: {
-						id: req.body.recipeId,
+						id: parseInt(recipeId),
 					},
 				},
 				user: {
 					connect: {
-						id: req.body.userId,
+						id: parseInt(userId),
 					},
 				},
-				rating: req.body.rating,
-				review: req.body.review,
+				rating: parseInt(rating),
+				review: review,
 			},
 			include: {
 				recipe: true,
 				user: true,
 			},
 		});
-		return res.json({ success: true, message: 'rating added', review });
+		return res.json({ success: true, message: 'rating added' });
 	} catch (error) {
 		console.log(error);
 		return res.json({ success: false, message: 'Something Went Wrong' });
@@ -55,10 +56,11 @@ router.post('/reviews', validateAuth, async (req, res) => {
 });
 
 router.delete('/reviews/:reviewId', validateAuth, async (req, res) => {
+	const { reviewId } = req.params;
 	try {
 		const findReview = await prisma.review.findUnique({
 			where: {
-				id: parseInt(req.params.reviewId),
+				id: parseInt(reviewId),
 			},
 		});
 		if (!findReview) {
@@ -81,10 +83,12 @@ router.delete('/reviews/:reviewId', validateAuth, async (req, res) => {
 });
 
 router.patch('/reviews/:reviewId', validateAuth, async (req, res) => {
+	const { rating, review } = req.body;
+	const { reviewId } = req.params;
 	try {
 		const findReview = await prisma.review.findUnique({
 			where: {
-				id: parseInt(req.params.reviewId),
+				id: parseInt(reviewId),
 			},
 		});
 		if (!findReview) {
@@ -92,11 +96,11 @@ router.patch('/reviews/:reviewId', validateAuth, async (req, res) => {
 		}
 		const updatedReview = await prisma.review.update({
 			where: {
-				id: parseInt(req.params.reviewId),
+				id: parseInt(reviewId),
 			},
 			data: {
-				review: req.body.review,
-				rating: req.body.rating,
+				review: review,
+				rating: rating,
 			},
 		});
 		return res.json({ success: true, updatedReview });

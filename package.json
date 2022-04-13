@@ -7,7 +7,8 @@
 	"scripts": {
 		"start": "node index.js",
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"dev": "nodemon index.js"
+		"dev": "nodemon index.js",
+		"migrate": "npx prisma migrate dev"
 	},
 	"prisma": {
 		"seed": "node prisma/seed.js"
@@ -18,10 +19,10 @@
 	"devDependencies": {
 		"nodemon": "^2.0.15",
 		"prettier": "^2.5.1",
-		"prisma": "^3.6.0"
+		"prisma": "^3.12.0"
 	},
 	"dependencies": {
-		"@prisma/client": "^3.6.0",
+		"@prisma/client": "^3.12.0",
 		"bcrypt": "^5.0.1",
 		"cloudinary": "^1.27.1",
 		"cors": "^2.8.5",
@@ -37,6 +38,6 @@
 		"yup": "^0.32.11"
 	},
 	"engines": {
-		"node": "16.13.1"
+		"node": "16.14.2"
 	}
 }

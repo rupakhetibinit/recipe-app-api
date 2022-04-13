@@ -5,17 +5,19 @@ const router = express.Router();
 const validateAuth = require('../middlewares/validateAuth');
 
 router.post('/recipes', validateAuth, async (req, res) => {
+	const { name, description, imageUrl, servings, steps, ingredients } =
+		req.body;
 	try {
 		const recipe = await prisma.recipe.create({
 			data: {
-				name: req.body.name,
-				description: req.body.description,
-				imageUrl: req.body.imageUrl,
-				servings: req.body.servings,
-				steps: req.body.steps,
+				name: name,
+				description: description,
+				imageUrl: imageUrl,
+				servings: servings,
+				steps: steps,
 				ingredients: {
 					createMany: {
-						data: req.body.ingredients,
+						data: ingredients,
 					},
 				},
 			},
@@ -98,6 +100,11 @@ router.delete('/recipes/:id', validateAuth, async (req, res) => {
 				recipeId: parseInt(req.params.id),
 			},
 		});
+		const deleteReview = prisma.review.deleteMany({
+			where: {
+				recipeId: parseInt(req.params.id),
+			},
+		});
 		const deleteRecipe = prisma.recipe.delete({
 			where: {
 				id: parseInt(req.params.id),
@@ -107,6 +114,7 @@ router.delete('/recipes/:id', validateAuth, async (req, res) => {
 		const transaction = await prisma.$transaction([
 			deleteIngredients,
 			deleteOrders,
+			deleteReview,
 			deleteRecipe,
 		]);
 
@@ -116,7 +124,7 @@ router.delete('/recipes/:id', validateAuth, async (req, res) => {
 		res.json({ message: 'Recipe deleted', transaction: transaction });
 	} catch (err) {
 		console.log(err);
-		res.json({ error: 'Something went wrong', meta: error.meta });
+		res.json({ error: 'Something went wrong' });
 	}
 });
 
