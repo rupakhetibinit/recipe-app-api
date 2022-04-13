@@ -26,7 +26,7 @@ router.post('/register', validation(userSchema), async (req, res) => {
 				email: email,
 			},
 		});
-		if (user) {
+		if (user && verified === true) {
 			return res.status(403).json({
 				success: false,
 				error: 'User with email already exists',
@@ -149,6 +149,7 @@ router.post('/login', validation(loginSchema), async (req, res) => {
 				location: user.location,
 				wallet: user.wallet,
 				phone: user.phone,
+				verified: user.verified,
 			});
 		} else {
 			return res.json({
@@ -238,7 +239,7 @@ router.post('/token', async (req, res) => {
 				email: email,
 			},
 		});
-		const otp = user.Otp;
+		const otp = user.Otp === token ? true : false;
 
 		if (!otp) {
 			return res.status(403).json({
