@@ -1,5 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
-
+const asyncMiddleware = require('../asyncMiddleware');
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
@@ -17,8 +17,10 @@ const validation = require('../middlewares/validationMiddleware');
 const otpGenerator = require('otp-generator');
 // Register
 
-router.post('/register', validation(userSchema), async (req, res) => {
-	try {
+router.post(
+	'/register',
+	validation(userSchema),
+	asyncMiddleware(async (req, res) => {
 		const { name, email, password, isAdmin } = req.body;
 		const hashedPassword = await bcrypt.hash(password, saltRounds);
 		const user = await prisma.user.findUnique({
@@ -26,7 +28,7 @@ router.post('/register', validation(userSchema), async (req, res) => {
 				email: email,
 			},
 		});
-		if (user && verified === true) {
+		if (user && user.verified === true) {
 			return res.status(403).json({
 				success: false,
 				error: 'User with email already exists',
@@ -108,13 +110,8 @@ router.post('/register', validation(userSchema), async (req, res) => {
 			verified: savedUser.verified,
 			verificationCode: verificationCode,
 		});
-	} catch (error) {
-		console.log(error);
-		return res
-			.status(500)
-			.json({ success: false, error: 'Internal Sever Error' });
-	}
-});
+	})
+);
 
 router.post('/login', validation(loginSchema), async (req, res) => {
 	try {
