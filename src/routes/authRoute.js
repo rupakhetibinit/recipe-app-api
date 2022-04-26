@@ -113,8 +113,10 @@ router.post(
 	})
 );
 
-router.post('/login', validation(loginSchema), async (req, res) => {
-	try {
+router.post(
+	'/login',
+	validation(loginSchema),
+	asyncMiddleware(async (req, res) => {
 		const { email, password } = req.body;
 		const user = await prisma.user.findUnique({
 			where: {
@@ -123,10 +125,11 @@ router.post('/login', validation(loginSchema), async (req, res) => {
 		});
 		if (!user) {
 			console.log('User not found');
-			return res.send({ success: false, message: 'User not found' });
+			return res.sendStatus(404);
 		}
 		const isAdmin = user.isAdmin;
 		const success = await bcrypt.compare(password, user.password);
+
 		if (success) {
 			const accessToken = jwt.sign(
 				{ email, isAdmin },
@@ -136,8 +139,7 @@ router.post('/login', validation(loginSchema), async (req, res) => {
 				}
 			);
 
-			return res.json({
-				success: true,
+			return res.status(201).json({
 				userId: user.id,
 				email: user.email,
 				accessToken: accessToken,
@@ -154,23 +156,15 @@ router.post('/login', validation(loginSchema), async (req, res) => {
 				message: `Error email or password doesn't match`,
 			});
 		}
-	} catch (error) {
-		console.log(error);
-		return res
-			.status(500)
-			.json({ success: false, error: 'Internal Sever Error' });
-	}
-});
+	})
+);
 
 router.get('/token', async (req, res) => {
 	try {
 		const token =
 			req.headers.authorization && req.headers.authorization.split(' ')[1];
 		if (!token) {
-			return res.json({
-				success: false,
-				error: 'Token not found',
-			});
+			return res.sendStatus(401);
 		}
 		const decoded = jwt.verify(
 			token,

@@ -249,8 +249,8 @@ router.get('/orders', validateAuth, async (req, res, next) => {
 		const getAllOrders = await prisma.orders.findMany({
 			include: {
 				user: true,
-				ingredients: true,
-				recipe: true,
+				// ingredients: true,
+				// recipe: true,
 			},
 		});
 		if (getAllOrders === null) {
