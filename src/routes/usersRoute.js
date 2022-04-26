@@ -7,7 +7,11 @@ const prisma = new PrismaClient();
 router.get('/users', validateAuth, async (req, res) => {
 	try {
 		const users = await prisma.user.findMany({
-			include: {
+			select: {
+				id: true,
+				email: true,
+				name: true,
+				wallet: true,
 				_count: {
 					select: {
 						orders: true,
