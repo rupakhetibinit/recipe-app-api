@@ -166,4 +166,18 @@ router.patch('/users/update', async (req, res) => {
 	}
 });
 
+router.delete('/users/:id', async (req, res) => {
+	const { id } = req.params;
+	try {
+		const deletedUser = await prisma.user.delete({
+			where: {
+				id: parseInt(id),
+			},
+		});
+		return res.json({ success: true, deletedUser: deletedUser });
+	} catch (error) {
+		return res.json({ error: 'Something went wrong', message: error.message });
+	}
+});
+
 module.exports = router;
