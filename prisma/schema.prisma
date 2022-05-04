@@ -44,14 +44,16 @@ model Recipe {
 }
 
 model Ingredient {
-  id        Int      @id @default(autoincrement())
-  name      String
-  price     Int
-  recipeId  Int
-  recipe    Recipe   @relation(fields: [recipeId], references: [id])
-  orders    Orders[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  id          Int      @id @default(autoincrement())
+  name        String
+  price       Int
+  measurement String?
+  amount      Float?
+  recipeId    Int
+  recipe      Recipe   @relation(fields: [recipeId], references: [id])
+  orders      Orders[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
 }
 
 model Orders {
