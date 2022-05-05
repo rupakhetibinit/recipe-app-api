@@ -49,6 +49,7 @@ model Ingredient {
   price       Int
   measurement String?
   amount      Float?
+  required    String?
   recipeId    Int
   recipe      Recipe   @relation(fields: [recipeId], references: [id])
   orders      Orders[]
