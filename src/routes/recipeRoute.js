@@ -150,16 +150,41 @@ router.patch('/recipes/:id', validateAuth, async (req, res) => {
 			return res.status(400).json({ message: 'Recipe not found' });
 		}
 		const updateIngredients = ingredients.map((ingredient) =>
-			prisma.ingredient.update({
+			// prisma.ingredient.update({
+			// 	where: {
+			// 		id: ingredient.id,
+			// 	},
+			// 	data: {
+			// 		amount: ingredient.amount,
+			// 		measurement: ingredient.measurement,
+			// 		price: ingredient.price,
+			// 		name: ingredient.name,
+			// 		required: ingredient.required,
+			// 	},
+			// })
+			prisma.ingredient.upsert({
 				where: {
 					id: ingredient.id,
 				},
-				data: {
+				update: {
 					amount: ingredient.amount,
 					measurement: ingredient.measurement,
 					price: ingredient.price,
 					name: ingredient.name,
 					required: ingredient.required,
+				},
+
+				create: {
+					amount: ingredient.amount,
+					measurement: ingredient.measurement,
+					price: ingredient.price,
+					name: ingredient.name,
+					required: ingredient.required,
+					recipe: {
+						connect: {
+							id: parseInt(req.params.id),
+						},
+					},
 				},
 			})
 		);
