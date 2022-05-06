@@ -252,7 +252,14 @@ router.get('/orders', validateAuth, async (req, res, next) => {
 				delivered: true,
 				createdAt: true,
 				total: true,
-				ingredients: true,
+				ingredients: {
+					select: {
+						name: true,
+						amount: true,
+						measurement: true,
+						price: true,
+					},
+				},
 				user: {
 					select: {
 						name: true,
