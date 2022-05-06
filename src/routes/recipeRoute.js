@@ -128,4 +128,54 @@ router.delete('/recipes/:id', validateAuth, async (req, res) => {
 	}
 });
 
+// update a recipe
+router.patch('/recipes/:id', validateAuth, async (req, res) => {
+	try {
+		const { name, description, imageUrl, servings, steps, ingredients } =
+			req.body;
+
+		const updatedRecipe = prisma.recipe.update({
+			where: {
+				id: parseInt(req.params.id),
+			},
+			data: {
+				name: name,
+				description: description,
+				steps: steps,
+				servings: servings,
+				imageUrl: imageUrl,
+			},
+		});
+		if (updatedRecipe == null || undefined) {
+			return res.status(400).json({ message: 'Recipe not found' });
+		}
+		const updateIngredients = ingredients.map((ingredient) =>
+			prisma.ingredient.update({
+				where: {
+					id: ingredient.id,
+				},
+				data: {
+					amount: ingredient.amount,
+					measurement: ingredient.measurement,
+					price: ingredient.price,
+					name: ingredient.name,
+					required: ingredient.required,
+				},
+			})
+		);
+		if (updateIngredients == null || undefined) {
+			return res.status(404).json({ message: 'Ingredient not found' });
+		}
+
+		const final = await prisma.$transaction([
+			updatedRecipe,
+			...updateIngredients,
+		]);
+		return res.json({ message: 'Recipe updated', transaction: final });
+	} catch (error) {
+		console.log(error);
+		return res.json({ error: 'Something went wrong', error: error });
+	}
+});
+
 module.exports = router;
