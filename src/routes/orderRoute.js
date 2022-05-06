@@ -102,6 +102,9 @@ router.get('/orders/user/:userId', validateAuth, async (req, res) => {
 					equals: parseInt(req.params.userId),
 				},
 			},
+			include: {
+				ingredients: true,
+			},
 		});
 		if (!orders) {
 			res.json({ message: 'No orders found' });
